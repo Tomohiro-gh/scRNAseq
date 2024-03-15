@@ -1,6 +1,7 @@
 # Single Cell network analysis
 
-## SCENIC (R or Python) (for scRNAseq. data)
+## SCENIC (Single Cell rEgulatory Network Inference and Clustering) (for scRNAseq. data)
+#### R or Python is avairable 
 to install in R
 
 https://htmlpreview.github.io/?https://github.com/aertslab/SCENIC/blob/master/inst/doc/SCENIC_Setup.html
