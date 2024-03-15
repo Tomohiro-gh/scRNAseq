@@ -66,6 +66,9 @@ Article: https://www.nature.com/articles/s41586-022-05688-9
 
 ------------------
 ## DeepMAPS (for multi-omics)
+Docker:  https://github.com/OSU-BMBL/deepmaps
+
+Webserver: https://bmblx.bmi.osumc.edu/
 
 ------------------
 ## SCENIC+ (for multi-omics)
