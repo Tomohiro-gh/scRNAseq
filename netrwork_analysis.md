@@ -70,6 +70,9 @@ Docker:  https://github.com/OSU-BMBL/deepmaps
 
 Webserver: https://bmblx.bmi.osumc.edu/
 
+Article: https://www.nature.com/articles/s41467-023-36559-0
+
+
 ------------------
 ## SCENIC+ (for multi-omics)
 https://scenicplus.readthedocs.io/en/latest/install.html
