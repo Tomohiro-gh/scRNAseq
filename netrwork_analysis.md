@@ -50,6 +50,32 @@ devtools::install_github("aertslab/SCENIC")
 packageVersion("SCENIC") #[1] ‘1.3.1’
 
 ```
+
+さらに，databaseの構築が必要
+
+今回はこちらを使用
+
+Mouse：https://resources.aertslab.org/cistarget/databases/mus_musculus/mm10/refseq_r80/mc9nr/gene_based/
+
+Human：https://resources.aertslab.org/cistarget/databases/mus_musculus/mm10/refseq_r80/mc9nr/gene_based/
+
+```sh
+# Terminalで．
+cd xxx
+
+For mouse
+feather_database_url='https://resources.aertslab.org/cistarget/databases/mus_musculus/mm10/refseq_r80/mc9nr/gene_based/mm10__refseq-r80__10kb_up_and_down_tss.mc9nr.genes_vs_motifs.rankings.feather'
+wget "${feather_database_url}"
+feather_database_url2='https://resources.aertslab.org/cistarget/databases/mus_musculus/mm10/refseq_r80/mc9nr/gene_based/mm10__refseq-r80__500bp_up_and_100bp_down_tss.mc9nr.genes_vs_motifs.rankings.feather'
+wget "${feather_database_url2}"
+```
+
+
+Workflow 
+
+https://rdrr.io/github/aertslab/SCENIC/f/vignettes/SCENIC_Running.Rmd
+
+
 ------------------
 ## scGRN (for multi-omics)
 web based 
