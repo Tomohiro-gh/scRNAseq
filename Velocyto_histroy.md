@@ -1,6 +1,6 @@
-## Velocytoに関する環境構築の記録
+# Velocytoの環境構築記録
 
-velocytoのための環境構築の備忘録
+
 
 ----
 ### NIG supercomputer on 04/20/24
@@ -61,7 +61,8 @@ Traceback (most recent call last):
 ModuleNotFoundError: No module named 'loompy'
 ###                                                                             
 ```
-とりあえず loompyを入れて再び実行
+loompyを入れたところ問題なかった
+
 ```sh
 $ conda install loompy
 $ velocyto --help
@@ -80,7 +81,7 @@ Commands:
   run-smartseq2  Runs the velocity analysis on SmartSeq2 data (independent bam file per cell)
   tools          helper tools for velocyto
 ```
-
+-> OK! 無事にrunが確認できた
 ----
 
 ----
