@@ -81,7 +81,8 @@ Commands:
   run-smartseq2  Runs the velocity analysis on SmartSeq2 data (independent bam file per cell)
   tools          helper tools for velocyto
 ```
--> OK! 無事にrunが確認できた
+-> OK! 無事にrunが確認できた (Exp190-1and-2_HeartEC_230419.sh)
+
 ----
 
 ----
