@@ -1,6 +1,17 @@
+# run velocyto 
 
+-----
+Example run at NIG supercomputer
 ```sh
 #!/bin/bash
+#$ -S /bin/bash
+#$ -cwd
+#$ -l medium
+#$ -pe def_slot 8
+#$ -l s_vmem=18G,mem_req=18G
+#$ -o velocyto.txt
+#$ -e velocyto_Err.txt
+
 
 source ~/.bashrc
 
@@ -13,7 +24,7 @@ conda activate velo3.6
 ## Step1. gtfファイルの準備：  >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # wdにgene.gtfファイルを用意する（wdにないとダメっぽい）
 LOCK_FILE="genes.gtf"
-  if [ -f ${LOCK_FILE} ]; then
+if [ -f ${LOCK_FILE} ]; then
   
     echo "genes.gtf file used in Cellranger Count command exists in current directory ! "
 
