@@ -20,9 +20,10 @@ pip install cellbender
 ```
 ImportError: /lib64/libstdc++.so.6: version `CXXABI_1.3.9' 
 ```
+pending
 
---------------------
-Installation on my mac (sonoma 14.4.1) 24/04/25
+-------------------- 
+Installation on my mac (sonoma 14.4.1) 24/04/25 -> suceeded!
 
 ```sh
 conda create -n cellbender python=3.7
@@ -33,67 +34,13 @@ pip install cellbender
 
 ただし，Docker imageの方は失敗した．
 
----------------------
-##  Trial 
-#### 04/25/24
-下記実行
-```sh
-$ sh CellBenderTest_240425.sh
-```
-
-コードの中身： 
-
-```sh
-#!/bin/bash
-
-conda activate cellbender
-
-wd=/Volumes/../CellrangerCount/1_cellranger_count_v1
-cd $wd
-
-path_to_fastq=/Volumes/../rawfastq
-
-
-ls -F $path_to_fastq | grep / | sed s/\\/$//g >> ./SampleList.txt
-
-LOCK_FILE2="SampleList.txt"
-
-
-cat ./${LOCK_FILE2} | while read line
-do
-    mkdir $wd/${line}_cellbender
-    OutDir=$wd/${line}_cellbender
-
-    cellbender remove-background \
-        --input $wd/${line}/outs/raw_feature_bc_matrix.h5 \
-        --output $OutDir/${line}_cellbender_matrix.h5
-done
-
-```
- ---------------------
-
-### Tutorial
-```sh
-conda activate cellbender
-
-SampleName=MySampleName
-
-cellbender remove-background \
-        --input $InputDir/raw_feature_bc_matrix.h5 \
-        --output $OutDir/$SampleName_cellbender_matrix.h5 \
-        --expected-cells 9500
-```
-
-#### 出力ファイル
-・　${SampleName}_cellbender_matrix.h5 : 正規化された環境トランスクリプトの豊富さ、各ドロップレットの汚染度合い、バックグラウンド補正後の遺伝子発現の低次元埋め込み、およびバックグラウンド補正後のカウント行列（CSC疎行列形式）などが含まれるraw dataのファイル
-
-・　${SampleName}_cellbender_matrix_filtered.h5 : 後方の細胞確率が0.5を超えるドロップレットを含む -> Seuratで解析するファイル
-
-・　
 
 ---------------------
-
 ### Usage
+
+・　Input file: raw_feature_bc_matrix.h5　（cellranger countの出力ファイル) <- これのみでいい
+
+
 ```
 
 $ cellbender remove-background -h
@@ -308,3 +255,77 @@ optional arguments:
 
 ```
 
+---------------------
+##  Trial 
+#### 04/25/24
+下記実行
+```sh
+$ sh CellBenderTest_240425.sh
+```
+
+コードの中身： 
+
+```sh
+#!/bin/bash
+
+conda activate cellbender
+
+wd=/Volumes/../CellrangerCount/1_cellranger_count_v1
+cd $wd
+
+path_to_fastq=/Volumes/../rawfastq
+
+
+ls -F $path_to_fastq | grep / | sed s/\\/$//g >> ./SampleList.txt
+
+LOCK_FILE2="SampleList.txt"
+
+
+cat ./${LOCK_FILE2} | while read line
+do
+    mkdir $wd/${line}_cellbender
+    OutDir=$wd/${line}_cellbender
+
+    cellbender remove-background \
+        --input $wd/${line}/outs/raw_feature_bc_matrix.h5 \
+        --output $OutDir/${line}_cellbender_matrix.h5
+done
+
+```
+### Tutorial
+#### Example1
+ Expected cellのパラメータのみ設定
+```sh
+conda activate cellbender
+
+SampleName=MySampleName
+
+cellbender remove-background \
+        --input $InputDir/raw_feature_bc_matrix.h5 \
+        --output $OutDir/$SampleName_cellbender_matrix.h5 \
+        --expected-cells 9500
+```
+
+#### 出力ファイル
+・　${SampleName}_cellbender_matrix.h5 : 正規化された環境トランスクリプトの豊富さ、各ドロップレットの汚染度合い、バックグラウンド補正後の遺伝子発現の低次元埋め込み、およびバックグラウンド補正後のカウント行列（CSC疎行列形式）などが含まれるraw dataのファイル
+
+・　${SampleName}_cellbender_matrix_filtered.h5 : 後方の細胞確率が0.5を超えるドロップレットを含む -> Seuratで解析するファイル
+
+・　
+
+
+#### Example2
+・　Dropletの数を指定
+```sh
+conda activate cellbender
+
+SampleName=MySampleName
+
+cellbender remove-background \
+        --input $InputDir/raw_feature_bc_matrix.h5 \
+        --output $OutDir/$SampleName_cellbender_matrix.h5 \
+        --expected-cells 9500 \
+        --total-droplets-included 30000 \
+       
+
+---------------------
