@@ -3,7 +3,9 @@
 ## Installation
 Official page： https://cellbender.readthedocs.io/en/latest/installation/index.html
 
-参考ページ：　 https://labo-code.com/bioinformatics/qc-cellbender/
+Japanese：　 https://labo-code.com/bioinformatics/qc-cellbender/
+
+10X: https://www.10xgenomics.com/jp/analysis-guides/background-removal-guidance-for-single-cell-gene-expression-datasets-using-third-party-tools
 
 
 --------------------
