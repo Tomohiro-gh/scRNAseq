@@ -9,30 +9,121 @@ Japanese：　 https://labo-code.com/bioinformatics/qc-cellbender/
 
 
 --------------------
-Installation on NIG supercomputer 24/4/20 -> Failed
+#### Installation on NIG supercomputer
+>  24/4/20 -> Failed
+> しかしエラーが出てしまった．
+> ```
+> ImportError: /lib64/libstdc++.so.6: version `CXXABI_1.3.9' 
+> ```
+> pending
+
+Update 24/04/26 : mac studioと同じようにしたら無事install完了
 
 ```sh
-conda create -n cellbender python=3.7
-conda activate cellbender
+conda create -n CellBender python=3.7
+conda activate CellBender
 pip install cellbender
 ```
-しかしエラーが出てしまった．
-```
-ImportError: /lib64/libstdc++.so.6: version `CXXABI_1.3.9' 
-```
-pending
+
 
 -------------------- 
-Installation on my mac (sonoma 14.4.1) 24/04/25 -> suceeded!
+#### Installation on my mac (sonoma 14.4.1)
+24/04/25 -> suceeded!
 
 ```sh
-conda create -n cellbender python=3.7
-conda activate cellbender
+conda create -n CellBender python=3.7
+conda activate CellBender
 pip install cellbender
 ```
 こっちではOK. 無事runできた．
 
 ただし，Docker imageの方は失敗した．
+
+
+---------------------
+##  Trial 
+#### 04/25/24
+下記実行
+```sh
+$ sh CellBenderTest_240425.sh
+```
+
+コードの中身： 
+
+```sh
+#!/bin/bash
+
+conda activate cellbender
+
+wd=/Volumes/../CellrangerCount/1_cellranger_count_v1
+cd $wd
+
+path_to_fastq=/Volumes/../rawfastq
+
+
+ls -F $path_to_fastq | grep / | sed s/\\/$//g >> ./SampleList.txt
+
+LOCK_FILE2="SampleList.txt"
+
+
+cat ./${LOCK_FILE2} | while read line
+do
+    mkdir $wd/${line}_cellbender
+    OutDir=$wd/${line}_cellbender
+
+    cellbender remove-background \
+        --input $wd/${line}/outs/raw_feature_bc_matrix.h5 \
+        --output $OutDir/${line}_cellbender_matrix.h5
+done
+
+```
+### Tutorial
+#### Example1
+ Expected cellのパラメータのみ設定
+```sh
+conda activate cellbender
+
+SampleName=MySampleName
+
+cellbender remove-background \
+        --input $InputDir/raw_feature_bc_matrix.h5 \
+        --output $OutDir/$SampleName_cellbender_matrix.h5 \
+        --expected-cells 9500
+```
+
+#### Example2
+・　Dropletの数を指定
+```sh
+conda activate cellbender
+
+SampleName=MySampleName
+
+cellbender remove-background \
+        --input $InputDir/raw_feature_bc_matrix.h5 \
+        --output $OutDir/$SampleName_cellbender_matrix.h5 \
+        --expected-cells 9500 \
+        --total-droplets-included 30000 \
+```    
+
+---------------------
+
+### 出力ファイル
+・　${SampleName}_cellbender_matrix.h5 : 正規化された環境トランスクリプトの豊富さ、各ドロップレットの汚染度合い、バックグラウンド補正後の遺伝子発現の低次元埋め込み、およびバックグラウンド補正後のカウント行列（CSC疎行列形式）などが含まれるraw dataのファイル
+
+・　${SampleName}_cellbender_matrix_filtered.h5 : 後方の細胞確率が0.5を超えるドロップレットを含む -> Seuratで解析するファイルだが，現在のcelranger version 7のフォーマットでは受け付けてくれない．
+
+実は現在のsueratのversionでは`Read10X_h5()`関数で読めないらしい -> [Documentation](https://cellbender.readthedocs.io/en/latest/tutorial/index.html#open-in-seurat)
+
+> Seurat 4.0.2 uses a dataloader Read10X_h5() which is not currently compatible with the CellBender output file format.
+
+[Issues#315](https://github.com/broadinstitute/CellBender/issues/315) も参照
+
+解決方法がTutorialに書いてある： 
+
+```sh
+$ ptrepack --complevel 5 tiny_output_filtered.h5:/matrix tiny_output_filtered_seurat.h5:/matrix
+```
+これを通せば，`Read10X_h5()`で読めるようになる．
 
 
 ---------------------
@@ -254,88 +345,3 @@ optional arguments:
 
 
 ```
-
----------------------
-##  Trial 
-#### 04/25/24
-下記実行
-```sh
-$ sh CellBenderTest_240425.sh
-```
-
-コードの中身： 
-
-```sh
-#!/bin/bash
-
-conda activate cellbender
-
-wd=/Volumes/../CellrangerCount/1_cellranger_count_v1
-cd $wd
-
-path_to_fastq=/Volumes/../rawfastq
-
-
-ls -F $path_to_fastq | grep / | sed s/\\/$//g >> ./SampleList.txt
-
-LOCK_FILE2="SampleList.txt"
-
-
-cat ./${LOCK_FILE2} | while read line
-do
-    mkdir $wd/${line}_cellbender
-    OutDir=$wd/${line}_cellbender
-
-    cellbender remove-background \
-        --input $wd/${line}/outs/raw_feature_bc_matrix.h5 \
-        --output $OutDir/${line}_cellbender_matrix.h5
-done
-
-```
-### Tutorial
-#### Example1
- Expected cellのパラメータのみ設定
-```sh
-conda activate cellbender
-
-SampleName=MySampleName
-
-cellbender remove-background \
-        --input $InputDir/raw_feature_bc_matrix.h5 \
-        --output $OutDir/$SampleName_cellbender_matrix.h5 \
-        --expected-cells 9500
-```
-
-#### Example2
-・　Dropletの数を指定
-```sh
-conda activate cellbender
-
-SampleName=MySampleName
-
-cellbender remove-background \
-        --input $InputDir/raw_feature_bc_matrix.h5 \
-        --output $OutDir/$SampleName_cellbender_matrix.h5 \
-        --expected-cells 9500 \
-        --total-droplets-included 30000 \
-```    
-
----------------------
-
-### 出力ファイル
-・　${SampleName}_cellbender_matrix.h5 : 正規化された環境トランスクリプトの豊富さ、各ドロップレットの汚染度合い、バックグラウンド補正後の遺伝子発現の低次元埋め込み、およびバックグラウンド補正後のカウント行列（CSC疎行列形式）などが含まれるraw dataのファイル
-
-・　${SampleName}_cellbender_matrix_filtered.h5 : 後方の細胞確率が0.5を超えるドロップレットを含む -> Seuratで解析するファイルだが，現在のcelranger version 7のフォーマットでは受け付けてくれない．
-
-実は現在のsueratのversionでは`Read10X_h5()`関数で読めないらしい -> [Documentation](https://cellbender.readthedocs.io/en/latest/tutorial/index.html#open-in-seurat)
-
-> Seurat 4.0.2 uses a dataloader Read10X_h5() which is not currently compatible with the CellBender output file format.
-
-[Issues#315](https://github.com/broadinstitute/CellBender/issues/315) も参照
-
-解決方法がTutorialに書いてある： 
-
-```sh
-$ ptrepack --complevel 5 tiny_output_filtered.h5:/matrix tiny_output_filtered_seurat.h5:/matrix
-```
-これを通せば，`Read10X_h5()`で読めるようになる．
