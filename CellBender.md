@@ -306,14 +306,6 @@ cellbender remove-background \
         --expected-cells 9500
 ```
 
-#### 出力ファイル
-・　${SampleName}_cellbender_matrix.h5 : 正規化された環境トランスクリプトの豊富さ、各ドロップレットの汚染度合い、バックグラウンド補正後の遺伝子発現の低次元埋め込み、およびバックグラウンド補正後のカウント行列（CSC疎行列形式）などが含まれるraw dataのファイル
-
-・　${SampleName}_cellbender_matrix_filtered.h5 : 後方の細胞確率が0.5を超えるドロップレットを含む -> Seuratで解析するファイル
-
-・　
-
-
 #### Example2
 ・　Dropletの数を指定
 ```sh
@@ -326,6 +318,24 @@ cellbender remove-background \
         --output $OutDir/$SampleName_cellbender_matrix.h5 \
         --expected-cells 9500 \
         --total-droplets-included 30000 \
-       
+```    
 
 ---------------------
+
+### 出力ファイル
+・　${SampleName}_cellbender_matrix.h5 : 正規化された環境トランスクリプトの豊富さ、各ドロップレットの汚染度合い、バックグラウンド補正後の遺伝子発現の低次元埋め込み、およびバックグラウンド補正後のカウント行列（CSC疎行列形式）などが含まれるraw dataのファイル
+
+・　${SampleName}_cellbender_matrix_filtered.h5 : 後方の細胞確率が0.5を超えるドロップレットを含む -> Seuratで解析するファイルだが，現在のcelranger version 7のフォーマットでは受け付けてくれない．
+
+実は現在のsueratのversionでは`Read10X_h5()`関数で読めないらしい -> [Documentation](https://cellbender.readthedocs.io/en/latest/tutorial/index.html#open-in-seurat)
+
+> Seurat 4.0.2 uses a dataloader Read10X_h5() which is not currently compatible with the CellBender output file format.
+
+[Issues#315](https://github.com/broadinstitute/CellBender/issues/315) も参照
+
+解決方法がTutorialに書いてある： 
+
+```sh
+$ ptrepack --complevel 5 tiny_output_filtered.h5:/matrix tiny_output_filtered_seurat.h5:/matrix
+```
+これを通せば，`Read10X_h5()`で読めるようになる．
