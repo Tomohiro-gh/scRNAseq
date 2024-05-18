@@ -1,14 +1,13 @@
 # run velocyto 
 
 -----
-Example run at NIG supercomputer
+### Example run at NIG supercomputer (05/18/24)
 ```sh
 #!/bin/bash
 #$ -S /bin/bash
 #$ -cwd
 #$ -l medium
-#$ -pe def_slot 8
-#$ -l s_vmem=18G,mem_req=18G
+#$ -l s_vmem=96G,mem_req=96G
 #$ -o velocyto.txt
 #$ -e velocyto_Err.txt
 
