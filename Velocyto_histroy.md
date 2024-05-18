@@ -3,7 +3,7 @@
 
 
 ----
-### NIG supercomputer on 04/20/24
+### 04/20/24 on NIG supercomputer 
 なぜかうごかくなくなった． velocytoしたらこれ． -> 24/04/07では使えていたのになぜ？？？
 ```sh
 $ velocyto
