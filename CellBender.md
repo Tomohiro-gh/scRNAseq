@@ -8,6 +8,10 @@ Japanese：　 https://labo-code.com/bioinformatics/qc-cellbender/
 10X: https://www.10xgenomics.com/jp/analysis-guides/background-removal-guidance-for-single-cell-gene-expression-datasets-using-third-party-tools
 
 
+### 参考ページ
+https://rpubs.com/kenneditodd/doublet_finder_example
+
+
 --------------------
 #### Installation on NIG supercomputer
 >  24/4/20 -> Failed
