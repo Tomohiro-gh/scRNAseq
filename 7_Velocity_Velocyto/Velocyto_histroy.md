@@ -1,6 +1,17 @@
 # Velocytoの環境構築記録
 
+----
+### 08/16/24 on macstudio <- inprogress
 
+```sh
+conda create -n volo3.6 python=3.6
+conda create -n volo3.6 python=3.6
+
+
+conda install numpy
+numpy scipy cython numba matplotlib scikit-learn h5py click
+conda 
+```
 
 ----
 ### 04/20/24 on NIG supercomputer 
