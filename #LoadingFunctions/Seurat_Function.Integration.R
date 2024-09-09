@@ -28,15 +28,14 @@ Fun.Integration.CCA <- function(merged_obj, split_condition){
   
 }
 
-  ## Perform integrated analysis
-  DefaultAssay(seurat_obj_int) <- "integrated"
-  seurat_obj_int <- ScaleData(seurat_obj_int, verbose = FALSE)
-  seurat_obj_int <- RunPCA(seurat_obj_int, npcs = 30, verbose = FALSE)
-  seurat_obj_int <- RunUMAP(seurat_obj_int, reduction = "pca", dims = 1:30)
-  seurat_obj_int <- FindNeighbors(seurat_obj_int, reduction = "pca", dims = 1:30)
-  seurat_obj_int <- FindClusters(seurat_obj_int, resolution = 0.5)
-  d
-
+  # ## Perform integrated analysis
+  # DefaultAssay(seurat_obj_int) <- "integrated"
+  # seurat_obj_int <- ScaleData(seurat_obj_int, verbose = FALSE)
+  # seurat_obj_int <- RunPCA(seurat_obj_int, npcs = 30, verbose = FALSE)
+  # seurat_obj_int <- RunUMAP(seurat_obj_int, reduction = "pca", dims = 1:30)
+  # seurat_obj_int <- FindNeighbors(seurat_obj_int, reduction = "pca", dims = 1:30)
+  # seurat_obj_int <- FindClusters(seurat_obj_int, resolution = 0.5)
+  
 ## >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
   
   
