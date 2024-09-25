@@ -37,8 +37,38 @@ FUN.DoHeatMap.v091324 <- function(SeuratAggr, DEG_features, slot){
 
 ```
 
+###### Exmaple, forと組み合わせて
+```r
 
---- 
+(Organs <- unique(df_Organ_Caps$cluster))
+df_Organ_Caps <- df_Organ_Caps |>
+  mutate(Expression = case_when(
+    avg_log2FC > 0 ~ "Positive",
+    avg_log2FC < 0 ~ "Negative"
+  ))
+
+for(i in c("Positive", "Negative")){
+  for(j in Organs){
+    for(k in c("scale.data", "data")){
+      #> cluster speric genes
+      Genes <- df_Organ_Caps |> 
+        filter(Expression == i) %>% 
+        filter(cluster == j) %>% 
+        slice_head(n = 50) %>% 
+        pull(gene)
+      
+  if(length(Genes) > 0){
+    FUN.DoHeatMap.v091324(SeuratAggr = Heart_cap.Age.agg,
+                          DEG_features = Genes,
+                          slot = k)
+      }
+    }
+  }
+}
+```
+
+---  
+## Tips
 #### How can I remove the legend for cell identity but not expression color bar using Doheatmap? #4557
  https://github.com/satijalab/seurat/issues/4557
 
