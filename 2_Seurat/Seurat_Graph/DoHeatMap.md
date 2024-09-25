@@ -82,3 +82,13 @@ DoHeatmap(ss, features = m1$gene)+
 
 DoHeatmap(ss, features = m1$gene)+
   guides(fill=FALSE)
+
+----
+#### Heatmap color 
+- `DoHeatmap(...) + scale_fill_gradientn(colours = color)`　で指定可能
+```r
+  ## ex
+  require(RColorBrewer)
+  color = rev(brewer.pal(9, "RdBu"))
+```
+
