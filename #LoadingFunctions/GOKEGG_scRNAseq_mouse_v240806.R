@@ -35,34 +35,43 @@ Mm <- useDataset("mmusculus_gene_ensembl", mart = db)
 #         values = Keys)
 
 
-print("fun.clusterProfiler.GOKG.mmu(df_DEG, ClusterofInterest, GeneColumn)
-      ")
-## GO KEGG analysis Function ------------------------------------------------------------------------------------
-FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
-                                              df_DEG, 
+print("FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu(Seurat_ojbject,df_DEG, 
                                               ClusterofInterest, 
+                                              GeneColumn = , 
+                                              PadjColumn = , 
+                                              pathwiew_drawing = FALSE)")
+## GO KEGG analysis Function ------------------------------------------------------------------------------------
+FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbject,
+                                              df_DEG, 
+                                              ClusterofInterest,
+                                              comparison2 = NULL,
+                                              comparison3 = NULL,
                                               GeneColumn = "gene", 
                                               PadjColumn = "p_val_adj", 
                                               pathwiew_drawing = FALSE){
   
   # df_DEG <- df_Parent %>% filter(cluster == ClusterofInterest)
-  
+# if(!exists(db, Mm, Keys, all.genes.df)) {
+  print("initial allgenes_df is been created")
+
   db <- useMart(biomart = "ENSEMBL_MART_ENSEMBL") #使用するmart指定
   Mm <- useDataset("mmusculus_gene_ensembl", mart = db)
-  
-  Keys <- rownames(Seurat_ojbjec)
-  
+
+  Keys <- rownames(Seurat_ojbject)
+
   all.genes.df <-
     getBM(attributes = c("mgi_symbol", "entrezgene_id"),  #ここで要素に入れたい項目を指定
           mart = Mm,
           filters = "mgi_symbol",
           values = Keys)
-  
-  
-  if(nrow(df_DEG) >0 ){
+# } if exist
+    FileName <- paste(ClusterofInterest, comparison2, comparison3, sep = "_")
     
-    new.dir <- paste0("GOKEGG_", ClusterofInterest)
+    new.dir <- paste0("clusterProfiler_", FileName)
+    
     dir.create(new.dir)
+    
+  if(nrow(df_DEG) >0 ){
     
     #require(clusterProfiler)
     require(clusterProfiler)
@@ -73,6 +82,11 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
     # names(df_DEG)[which(names(df_DEG) == GeneColumn)] <- "Symbol"
     # names(df_DEG)[which(names(df_DEG) == PadjColumn)] <- "p_val_adj"
     #　Inputの Symbolと referenceのmgi_symbolでくっつける
+    
+    ## coloumnのrenmae
+  # df_DEG <- df_DEG %>% 
+  #   dplyr::rename("gene" = GeneColumn)
+  
     df_DEG <- inner_join(df_DEG, all.genes.df, by = c("gene" = "mgi_symbol"))
       dim(df_DEG) # [1] 769   8
       print(head(df_DEG))
@@ -87,8 +101,8 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
       names(genes_adjp) <- df_DEG$entrezgene_id # vectorへ名前を入れる : names関数
     
     Named_logFC_list <- df_DEG$avg_log2FC
-      names(Named_logFC_list) <- df_DEG$entrezgene_id # vectorへ名前を入れる : names関数
-    
+      names(Named_logFC_list) <- df_DEG$entrezgene_id # vectorへ名前を入れる : names関
+  
     
   ##  2) GO  ############################# 
     ontology <- c("BP", "CC" ,"MF")
@@ -104,10 +118,17 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
                       qvalueCutoff = 0.2,
                       minGSSize = 5,
                       readable = TRUE)
-      # 似たような結果を除外してくれるsimplifyという関数
-      if (nrow(as.data.frame(simplify(ego)))>=1){
+      ## 結果を表示
+      print(paste("GO:", j,"in", ClusterofInterest,
+                  comparison2,
+                  comparison3, "resluts are below", sep = " "))
+      
+      print(head(as.data.frame(ego)))
+      
+      if(nrow(as.data.frame(ego)) >=1){  #結果が0なら飛ばす
         
-        ego.simple <- simplify(ego)
+        ego.simple <- simplify(ego)   # 似たような結果を除外する関数
+
         
         ego.simple.df <- ego.simple %>% 
           data.frame() %>% 
@@ -121,7 +142,7 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
           ggtitle(paste0("Enrich GO results of ", j," in ", ClusterofInterest))
             plot(p1)
               ggsave(paste0(new.dir, "/1_GO_", j, "_dotplot", ClusterofInterest, ".pdf"),
-                      width = 8, height = 12)
+                      width = 8, height = 14)
         # 2 visualize the results
         p2 <- clusterProfiler::cnetplot(ego.simple,
                                         node_label = "all",
@@ -129,44 +150,48 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
                                         foldChange = Named_logFC_list)
             plot(p2)
               ggsave(paste0(new.dir, "/1_GO_", j, "_centplot_", ClusterofInterest, ".png"),
-                     width = 10, height =12, dpi = 300)
+                     width = 10, height =14, dpi = 300)
         # 3 visualize the results
         ego_x2 <- enrichplot::pairwise_termsim(ego)
         p3 <- clusterProfiler::emapplot(ego_x2)
             plot(p3)
               ggsave(paste0(new.dir, "/1_GO_", j, "_emapplot_", ClusterofInterest, ".png"), 
-                            width = 10, height =12)
+                            width = 10, height =14)
       
         # 4 visulalize GO DAG graph
-        p4 <- goplot(ego.simple)
+        if(nrow(ego.simple)  > 10){
+        
+        p4 <- goplot(ego.simple, showCategory = 10)
           plot(p4)
-              ggsave(paste0(new.dir, "/1_GO_", j, "_DAGgrph_", ClusterofInterest, ".png"),
-                     width = 12, height =12)
-      }
+            ggsave(paste0(new.dir, "/1_GO_", j, "_DAGgrph_", ClusterofInterest, ".png"),
+                 width = 12, height =12)
+        }
+    print(paste0 ("GO:", j, " finished"))
+    }
     }
     
   ## 2)  GSEA  ##########################
     ## How to prepare gene list : https://yulab-smu.top/biomedical-knowledge-mining-book/faq.html#genelist
     ## Fullgenesetが必要．
-    FM_Allgenes <- FindMarkers(Seurat_ojbjec,
-                            # group.by = "EC_int_cca_sub",
-                            ident.1 = ClusterofInterest, #active identである必要がある
-                            # ident.2 = ,
-                            min.cells.group = 1, 
-                            min.cells.feature = 1,
-                            min.pct = 0,
-                            logfc.threshold = 0,
-                            only.pos = FALSE) %>% 
+    FM_Allgenes <- FindMarkers(
+      Seurat_ojbject,
+      # group.by = "EC_int_cca_sub",
+      ident.1 = ClusterofInterest, #active identである必要がある
+      # ident.2 = ,
+      min.cells.group = 1, 
+      min.cells.feature = 1,
+      min.pct = 0,
+      logfc.threshold = 0,
+      only.pos = FALSE) %>% 
       mutate(Symbol = rownames(.)) %>% 
-      inner_join(., all.genes.df,    #　Inputの Symbolと referenceのmgi_symbolでくっつける    #> Gene idの変換
-                 by = c("Symbol" = "mgi_symbol")) %>% 
+      inner_join(., all.genes.df, by = c("Symbol" = "mgi_symbol")) %>%
+      #　Inputの Symbolと referenceのmgi_symbolでくっつける    #> Gene idの変換
       filter(!is.na(entrezgene_id)) %>% 
       filter(!duplicated(entrezgene_id))
-          ## 確認表示
-          dim(FM_Allgenes) # [1] 30109    10
-          print(head(FM_Allgenes))
           # entrezgene_idがSymbolとentrezgene_idのduplicationを除く
-
+    
+    print("Start GSEA analysis")
+    
     allgenes_logFC <- FM_Allgenes$avg_log2FC
     names(allgenes_logFC) <- rownames(FM_Allgenes)
     
@@ -181,6 +206,17 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
                   pvalueCutoff = 0.05,
                   scoreType = "pos",
                   verbose = FALSE)
+    
+    ## GSEAの結果をdotplotで
+    nTop = 30
+    d <- dotplot(gse, showCategory = nTop) + 
+      ggtitle(paste0("GSEA result Top", nTop," in ", ClusterofInterest))
+    plot(d)
+    ggsave(paste0(new.dir, "/2_dotplot_GSEA_", ClusterofInterest, ".pdf"),
+           width = 8, height = 12, dpi = 300)
+    
+    if (nrow(as.data.frame(gse)) >= 1){
+      
     ## data frameへ変換
     res_GSEA <- setReadable(gse, 
                             OrgDb = org.Mm.eg.db, 
@@ -192,19 +228,10 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
       filter(qvalue < 1e-5) %>%
       filter(setSize >= 10 & setSize <= 200)
     
-    ## GSEAの結果をdotplotで
-    nTop = 30
-    d <- dotplot(gse, showCategory = nTop) + 
-      ggtitle(paste0("GSEA result Top", nTop," in ", ClusterofInterest))
-        plot(d)
-          ggsave(paste0(new.dir, "/2_dotplot_GSEA_", ClusterofInterest, ".pdf"),
-                 width = 8, height = 12, dpi = 300)
-    
-    if (nrow(res_GSEA_selected) >= 1){
       # ID <- res_GSEA$ID
       # Description <- res_GSEA$Description
       if (nrow(res_GSEA_selected) > 20){
-        number = 20
+        number = 5
       }else{number = nrow(res_GSEA_selected)}
       
       for(j in 1:number){
@@ -213,9 +240,14 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
                       geneSetID = res_GSEA_selected$ID[j], 
                       title = res_GSEA_selected$Description[j])
           plot(g)
+            # save
             ggsave(paste0(new.dir, "/2_GSEAplot_", ClusterofInterest, "_", res_GSEA_selected$Description[j],".png"),
                     width = 8, height = 6, dpi = 300)
+      } 
+    }else{res_GSEA <- data.frame()}
 
+    print("GSEA finished !")
+          
   ## 3)  KEGG  ############################# 
     # http://yulab-smu.top/biomedical-knowledge-mining-book/clusterprofiler-kegg.html
     ekg <- enrichKEGG(gene = names(Named_logFC_list), 
@@ -230,6 +262,10 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
                        keyType = "ENTREZID")
     
     if(nrow(as.data.frame(ekg))>=1){
+      
+      print("KEGG results are below: ")
+      print(as.data.frame(ekg))
+      
       # visualize the results
       p5 <- clusterProfiler::dotplot(ekg, showCategory = 30)
           pdf(paste0(new.dir, "/3_KEGG_dotplot_", ClusterofInterest, ".pdf"),
@@ -244,7 +280,7 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
         plot(p6)
           ggsave(paste0(new.dir, "/3_KEGG_centplot_", ClusterofInterest, ".png"),
            width = 10, height =12, dpi = 300)
-      }
+          
     # # RESULT2
     res_KEGG <- as.data.frame(ekg)
     
@@ -265,17 +301,20 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
                         limit = list(gene=2, cpd=1))
             }
     }
+    }else{res_KEGG <- data.frame()}
+    print("KEGG finished !")
+    
     ## 4) dataのsave #########
-    filename <- paste0("/3_ClusterProfiler_GOKEGGGSEA_results_", ClusterofInterest)
+    filename <- paste0("/3_ClusterProfiler_results_", ClusterofInterest)
     workbook <- createWorkbook()
     # sheetを作る
     addWorksheet(workbook, sheetName = "GO")
     addWorksheet(workbook, sheetName = "GSEA")
     addWorksheet(workbook, sheetName = "KEGG")
     # dataを書き込む
-    writeData(workbook, sheet = 1, x=res_GO, rowNames = FALSE)
-    writeData(workbook, sheet = 2, x=res_GSEA, rowNames = FALSE)
-    writeData(workbook, sheet = 3, x=res_KEGG, rowNames = FALSE)
+    writeData(workbook, sheet = 1, x = res_GO, rowNames = FALSE)
+    writeData(workbook, sheet = 2, x = res_GSEA, rowNames = FALSE)
+    writeData(workbook, sheet = 3, x = res_KEGG, rowNames = FALSE)
     #save
     saveWorkbook(workbook, file = paste0(new.dir, "/", filename, ".xlsx"), overwrite = TRUE)
     
@@ -286,8 +325,7 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbjec,
                  GO_result = ego, 
                  GSEA_result = gse), 
             paste0(new.dir, "/GOKEGGGSEA_resutls_ClusterMarker_", ClusterofInterest,".rds"))
-      } 
-    }
-    }
-  } #for文終わり
+     
+    } # DEG_dfのif 終わり
+  } # function終わり
 ## Functionここまで　-----------
