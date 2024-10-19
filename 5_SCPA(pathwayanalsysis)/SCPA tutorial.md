@@ -1,6 +1,6 @@
-## SCPA
-## [Single Cell Pathway Analysis](https://jackbibby1.github.io/SCPA/#tutorials)
+## [SCPA: Single Cell Pathway Analysis](https://jackbibby1.github.io/SCPA/#tutorials)
 
+Original paper: [J. A. Bibby et al., Cell Rep. 41, 111697 (2022).](https://www.cell.com/cell-reports/fulltext/S2211-1247(22)01571-6)
 
 #### Data interpreatation
 `compare_pathways`
