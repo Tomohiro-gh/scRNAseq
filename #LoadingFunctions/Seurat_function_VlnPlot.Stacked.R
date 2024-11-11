@@ -1,12 +1,12 @@
 library(Seurat)
 library(ggplot2)
+library(scales)
 
 message("
  VlnPlot.Stacked.v1(
     seurat_object, genelist, MyIdent, FileName = NULL) ")
 ## 2 
 VlnPlot.Stacked.v1 <- function(seurat_object, genelist, MyIdent, FileName = NULL){
-  
   MyTheme <-  theme(# text = element_text(hjust=0.5, size=16, face="bold"),
     axis.text = element_text(hjust=0.5, size= 16, face = "bold"),
     axis.text.x = element_text(size = 20, angle = 60, vjust = 1.0, color = "black"),
@@ -49,9 +49,9 @@ VlnPlot.Stacked.v1 <- function(seurat_object, genelist, MyIdent, FileName = NULL
   if(length(genelist) >= 3){
     Genenames <- paste(genelist[1:3], collapse = ",")
     Genenames <- paste0(Genenames, ",etc")
-  }else{Genenames = genelist}
+  }else{Genenames = paste(genelist, collapse = ",")}
   
-  imagename <- paste0("VlnStacked_", FileName,"_",Genenames, ".png")
+  imagename <- paste0("VlnStacked_", FileName,"_", Genenames, ".png")
   ggsave(imagename, dpi = 300, width = wid, height = hei,
          limitsize = FALSE)
   

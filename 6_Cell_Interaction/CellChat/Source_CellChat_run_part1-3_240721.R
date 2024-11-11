@@ -1,12 +1,3 @@
-## 引数受け取り
-Args = commandArgs(trailingOnly = TRUE)
-# Args = commandArgs()
-
-## 第一引数:ファイルの名前
-Args1_Filename = Args[1]
-# subObject = Args[2]
-
-
 library(Seurat)
 library(CellChat) # main
 library(ggplot2)
@@ -14,6 +5,19 @@ library(dplyr)
 library(openxlsx)
 
 options(future.globals.maxSize = 1000 * 1024 ^ 2) 
+
+#> Now analyzing
+Args = commandArgs(trailingOnly = TRUE) ## 引数受け取り
+# Args = commandArgs()
+  print(Args)
+## 第一引数:ファイルの名前
+Args1_Filename = Args[[1]]
+  print(paste0 ("Argument1: ", Args1_Filename))
+## 第二引数:ファイルの名前
+vertex.receiver = Args[[2]]
+  print(paste0 ("Argument2: ", vertex.receiver))
+  
+
 
 
 # 
@@ -30,32 +34,7 @@ options(future.globals.maxSize = 1000 * 1024 ^ 2)
 # }
 # attach(.myfunc.env)
 # ## -----------------------------------------------------------------
-# 
-# wd="/Users/tomohiro/Dropbox/FukuharaLab_Res/Experiment/Exp190_AgedHeratEC_scRNAseq/Part2_Analysis/3_ECint_DownstreamAnalysis/3-8_CellChat"
-# setwd(wd)
-
-# 
-# Object <- readRDS("/Users/tomohiro/Dropbox/FukuharaLab_Res/Experiment/Exp190_AgedHeratEC_scRNAseq/Part2_Analysis/2_IntegratativeAnalysis/3_Integration_EC_v3/AgedHeartECintegration_64300cells.rds")
-# Object
-# # An object of class Seurat 
-# # 32285 features across 64300 samples within 1 assay 
-# # Active assay: RNA (32285 features, 2000 variable features)
-# # 3 layers present: data, counts, scale.data
-# # 8 dimensional reductions calculated: pca, umap.unintegrated, integrated.cca, integrated.rpca, harmony, umap.cca, umap.rpca, umap.harmony
-# Idents(Object) <- "EC_int_cca_x_Age"
-# 
-# 
-# subObject <- subset(x=Object, subset = Age == "3month")
-# subObject
-# # An object of class Seurat 
-# # 32285 features across 15569 samples within 1 assay 
-# # Active assay: RNA (32285 features, 2000 variable features)
-# # 3 layers present: data, counts, scale.data
-# # 8 dimensional reductions calculated: pca, umap.unintegrated, integrated.cca, integrated.rpca, harmony, umap.cca, umap.rpca, umap.harmony
-# 
-# Idents(subObject) <- "EC_int_cca"
-# 
-
+#
 
 ## CellChat v2 ---------------------------------------
 ##  https://htmlpreview.github.io/?https://github.com/jinworks/CellChat/blob/master/tutorial/CellChat-vignette.html#b-starting-from-a-seurat-object
@@ -75,11 +54,10 @@ cellchat <- createCellChat(object = subObject, group.by = "ident", assay = "RNA"
 
 cellchat <- addMeta(cellchat, meta = meta)
 cellchat <- setIdent(cellchat, ident.use = "labels") # set "labels" as default cell identity
-  levels(cellchat@idents) # show factor levels of the cell labels
-# [1] "Large Artery"         "Artery"               "Capillary-Arterial"   "Capillary"            "Capillary-IFN"       
-# [6] "Capillary-Myocardium" "Capillary-Angiogenic" "Capillary-Mitotic"    "Capillary-Venous"     "Vein"                
-# [11] "Endocardium"     
+  levels(cellchat@idents) 
+  
 groupSize <- as.numeric(table(cellchat@idents)) # number of cells in each cell group
+
 
 
 ## Set the ligand-receptor interaction database ---------------------------------------
@@ -90,7 +68,10 @@ CellChatDB <- CellChatDB.mouse # use CellChatDB.mouse if running on mouse data
 
 # use a subset of CellChatDB for cell-cell communication analysis
 CellChatDB.use <- subsetDB(CellChatDB, 
-                           search = c("Secreted Signaling","Non-protein Signaling"),
+                           search = c("Secreted Signaling",
+                                      "Non-protein Signaling",
+                                      "ECM-Receptor",
+                                      "Cell-Cell Contact"),
                            key = "annotation") # use Secreted Signaling
 
 # Only uses the Secreted Signaling from CellChatDB v1
@@ -122,7 +103,7 @@ cellchat <- identifyOverExpressedInteractions(cellchat)
 # cellchat <- projectData(cellchat, PPI.human)
 
     
-    
+print("CellChat object has been created")
 
 ## ------------------------------------------------------------------------------------------
 ## Part II: Inference of cell-cell communication network  -----------------------------------
@@ -199,6 +180,9 @@ mat <- cellchat@net$weight
     dev.off()
 
 
+## save cellchat object
+saveRDS(cellchat, file = paste0("cellchatObject_", Args1_Filename, ".rds"))
+
 
 ## ------------------------------------------------------------------------------------------
 ## Part III: Visualization of cell-cell communication network -----------------------------------
@@ -255,7 +239,7 @@ for(i in 1:length(pathways.show.all)){
     
       LR.show <- pairLR[j,] # show one ligand-receptor pair
       # Hierarchy plot
-      vertex.receiver = c(1,2,3, 9,10,11) # a numeric vector
+      vertex.receiver = vertex.receiver # a numeric vector
     
         par(mfrow=c(1,1), xpd = TRUE)
           png(paste0("PartIII_", pathways.show, "_", LR.show, "_", Args1_Filename, "_netVisual_individual_circle.png"), 
@@ -290,14 +274,12 @@ for(i in 1:length(pathways.show.all)){
     
     ## あえて上に持ってくる
 
-
   ## Automatically save the plots of the all inferred network for quick exploration
   # Access all the signaling pathways showing significant communications
   # pathways.show.all <- cellchat@netP$pathways
   # check the order of cell identity to set suitable vertex.receiver
   # levels(cellchat@idents)
-  vertex.receiver = c(1, 2, 10, 11)
-    # Large Artery, Artery, Vein, Endocardium
+  vertex.receiver = vertex.receiver
     # Visualize communication network associated with both signaling pathway and individual L-R pairs
     netVisual(cellchat, 
               signaling = pathways.show,
@@ -310,10 +292,8 @@ for(i in 1:length(pathways.show.all)){
               plot = gg, 
               width = 6, height = 3, dpi = 300)
 
-} #pathway.show.all のloop
+} # end pathway.show.all
 
 ## ------------
 ## Visualize cell-cell communication mediated by multiple ligand-receptors or signaling pathways
 
-## save cellchat object
-saveRDS(cellchat, file = paste0("cellchatObject_", Args1_Filename, ".rds"))
