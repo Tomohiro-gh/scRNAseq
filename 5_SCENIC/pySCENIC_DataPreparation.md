@@ -124,9 +124,10 @@ if adata.X.dtype != np.float32:
 ```
 
 ##### --- ここからrow_attrsとcol_attrsの定義 ---
-    AnnDataのobs (細胞メタデータ) と var (遺伝子メタデータ) をDataFrameに変換
-    Loomファイルには `obs` が `col_attrs`、`var` が `row_attrs` に対応します
-    必ずDataFrame形式である必要があります
+- AnnDataのobs (細胞メタデータ) と var (遺伝子メタデータ) をDataFrameに変換
+- Loomファイルには `obs` が `col_attrs`、`var` が `row_attrs` に対応します
+- 必ずDataFrame形式である必要があります
+
 
 ```python
 # adata.obs (細胞属性) -> col_attrs (Loomファイルの列属性)
