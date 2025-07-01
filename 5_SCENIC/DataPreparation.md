@@ -1,4 +1,4 @@
-## pySCENICのためのdataのconversion: Seruat object -> Anndata
+# pySCENICのためのdataのconversion: Seruat object -> Anndata
 
 （条件）
 Seurat object (obj)　(version 5以降)を変換する
@@ -7,7 +7,7 @@ Seurat object (obj)　(version 5以降)を変換する
 
 `scCustomize`は python環境が必要
 
-### Conversion with scCustomize
+## STEP1: Conversion with scCustomize
 reticulateを使って，この環境にAnndataなどconvertに必要なものをロードする
 
 
@@ -40,9 +40,9 @@ reticulate::py_install(
   # 環境が正しく設定されているか確認
   print(reticulate::py_config())
 ```
+-------------------
 
-
-### Check and Modify data structure
+## STEP2: Check and Modify data structure
 このpython環境でAnndataがインポートできているか？
 ```r
 tryCatch({
