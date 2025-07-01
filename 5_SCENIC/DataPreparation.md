@@ -14,20 +14,17 @@ reticulateを使って，この環境にAnndataなどconvertに必要なもの�
 ```r
 library(reticulate)
 
+print(reticulate::py_config())
+
 ```
 通常、reticulateが自動で作成した環境は 'r-reticulate-env' という名前になりますが、
-  # 念のため py_config() の virtualenv: のパスを確認して適切な envname を特定してください。
-  # 例: /Users/tomohiro/Library/Caches/org.R-project.R/R/reticulate/uv/cache/archive-v0/cr9LxZ6Rsa0V3yD32FxUo
-  # この場合は、envname はそのパス全体を指定するか、reticulateが自動で認識する名前を使います。
-  # 一度 reticulate::py_config() を実行して、virtualenv のパスを正確に確認してください。
-  # 例: if virtualenv points to ".../cr9LxZ6Rsa0V3yD32FxUo", then envname should be that path or default.
-  
-  # 確実にインストールするために、環境名を明示的に指定し、force=TRUEを試す
-  # 重要なのは、py_config() で表示される 'python:' または 'virtualenv:' のパスが示す環境にインストールすることです。
-  # もしそれが `/Users/tomohiro/Library/Caches/org.R-project.R/R/reticulate/uv/cache/archive-v0/cr9LxZ6Rsa0V3yD32FxUo` なら、
-  # envname にそのパスを指定するのが最も確実です。
-  #>設定前のconfiguration
-  print(reticulate::py_config())
+  -  念のため py_config() の virtualenv: のパスを確認して適切な envname を特定してください。
+  -  例: /Users/tomohiro/Library/Caches/org.R-project.R/R/reticulate/uv/cache/archive-v0/cr9LxZ6Rsa0V3yD32FxUo
+  -  この場合は、envname はそのパス全体を指定するか、reticulateが自動で認識する名前を使います。
+  -  一度 reticulate::py_config() を実行して、virtualenv のパスを正確に確認してください。
+  -  例: if virtualenv points to ".../cr9LxZ6Rsa0V3yD32FxUo", then envname should be that path or default.  
+  -  重要なのは、py_config() で表示される 'python:' または 'virtualenv:' のパスが示す環境にインストールすることです。
+  -  もしそれが `/Users/tomohiro/Library/Caches/org.R-project.R/R/reticulate/uv/cache/archive-v0/cr9LxZ6Rsa0V3yD32FxUo` なら、 envname にそのパスを指定するのが最も確実です。
 
 #### この環境へ anndataをインストールする
 ```r
