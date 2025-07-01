@@ -20,10 +20,41 @@ pip uninstall numpy numba dask
 conda install numpy=1.23.5
 conda install numba=0.56.4
 conda install dask=2022.2.0
+```
 
+[ 重要！]
+これでもAUCellでエラーが出る．
+```
+  File "/opt/anaconda3/envs/pyscenic38/lib/python3.8/site-packages/pyscenic/cli/utils.py", line 347, in append_auc_mtx
+
+    for name, threshold in auc_thresholds.iteritems()
+
+AttributeError: 'Series' object has no attribute 'iteritems'
+
+```
+- `iteritems`でのエラーは pandas由来．
+- 非推奨的な方法だが，pyscenicのpandasの部分を書き換える >
+- 参考：　[BUG]'Series' object has no attribute 'iteritems' [#475](https://github.com/aertslab/pySCENIC/issues/475#issuecomment-2489952860)
+
+エラーのでた utils.pyをエディターで開く
+
+  "/opt/anaconda3/envs/pyscenic_v2/lib/python3.8/site-packages/pyscenic/cli/utils.py", line 347, in append_auc_mtx
+
+```
+##書き換え前
+iteritems
+
+##
+items
+```
+
+#> 最終的な環境は以下の通り．
+
+```sh
 conda list
 ```
-#### conda listで見てみる
+#####　何度も書くが，utils.pyは書き換えている
+
       # packages in environment at /opt/anaconda3/envs/pyscenic_v2:
       #
       # Name                    Version                   Build  Channel
