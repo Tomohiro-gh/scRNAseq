@@ -15,11 +15,16 @@
 conda create -y -n pyscenic python=3.10
 conda activate pyscenic
 
+# まずpyscenicをPyPlでインストール
+pip install pyscenic
+
 ## 特定のグレードにダウンする
-pip uninstall numpy numba dask
+pip uninstall numpy numba dask distributed
 conda install numpy=1.23.5
 conda install numba=0.56.4
 conda install dask=2022.2.0
+conda install distributed=2022.2.0
+
 ```
 
 [ 重要！]
