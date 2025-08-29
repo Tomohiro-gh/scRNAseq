@@ -52,10 +52,10 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbject,
   
   # df_DEG <- df_Parent %>% filter(cluster == ClusterofInterest)
 # if(!exists(db, Mm, Keys, all.genes.df)) {
-  print("initial allgenes_df is been created")
+  print("Step1: Creating allGenes dataframe")
 
-  db <- useMart(biomart = "ENSEMBL_MART_ENSEMBL") #使用するmart指定
-  Mm <- useDataset("mmusculus_gene_ensembl", mart = db)
+  # db <- useMart(biomart = "ENSEMBL_MART_ENSEMBL") #使用するmart指定
+  # Mm <- useDataset("mmusculus_gene_ensembl", mart = db)
 
   Keys <- rownames(Seurat_ojbject)
 
@@ -313,7 +313,7 @@ FUN.clusterProfiler.GOKGGSEA.scRNAseq.mmu <- function(Seurat_ojbject,
     addWorksheet(workbook, sheetName = "KEGG")
     # dataを書き込む
     writeData(workbook, sheet = 1, x = res_GO, rowNames = FALSE)
-    writeData(workbook, sheet = 2, x = res_GSEA, rowNames = FALSE)
+    writeData(workbook, sheet = 2, x = res_GSEA, rowNames = FALSE) %>% 
     writeData(workbook, sheet = 3, x = res_KEGG, rowNames = FALSE)
     #save
     saveWorkbook(workbook, file = paste0(new.dir, "/", filename, ".xlsx"), overwrite = TRUE)

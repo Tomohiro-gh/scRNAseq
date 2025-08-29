@@ -69,7 +69,7 @@ CellChatDB <- CellChatDB.mouse # use CellChatDB.mouse if running on mouse data
 # use a subset of CellChatDB for cell-cell communication analysis
 CellChatDB.use <- subsetDB(CellChatDB, 
                            search = c("Secreted Signaling",
-                                      "Non-protein Signaling",
+                                      #"Non-protein Signaling",
                                       "ECM-Receptor",
                                       "Cell-Cell Contact"),
                            key = "annotation") # use Secreted Signaling

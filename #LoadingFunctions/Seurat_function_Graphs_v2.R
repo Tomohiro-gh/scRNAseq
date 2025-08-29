@@ -118,25 +118,38 @@ fun.fp <- function(object, genes){
 ########### Featureplot一気に表示して保存する
 # Usage: fun.fp.batch(object, genelist, samplename, row.num)
 # Code: /Users/tomohiro/Dropbox/BioInfomatics/R_CommandList/Seurat/Seurat_Graph.R
-fun.fp.batch <- function(object, genelist, samplename, row.num){
+fun.fp.batch <- function(object, genelist, Name = NULL, 
+                         row.num, red = "umap.cca",
+                         colormode = c("Gradient", "2colors")){
   require(patchwork)
+  require(viridis)
+  if(colormode=="Gradient"){
+    colors = viridis::viridis(10)
+  }else{
+    colors = c("#D5D5D3","#CB2314")
+  }
   ps <- list()
   for (gene in genelist){
     
     p <- FeaturePlot(
       object, 
       gene,
-      cols = c("#D5D5D3","#CB2314"))
+      reduction = red,
+      cols = colors) +
+        theme(aspect.ratio = 1)
     
     ps[[gene]] <- p
   }
   # geneリストの名前を全てのせる
-  genenames <- paste(genelist, collapse = ",")
+  if(length(genelist)>=3){
+    genelist <- genelist[1:3]
+  }
+   genenames <- paste(genelist, collapse = ",")
   col.num <- ceiling(length(genelist)/row.num) #ceiling: x未満でない整数を返す
   wid <- 5.15*col.num
   hei <- 4.415*row.num
   wrap_plots(ps, nrow=row.num)
-  ggsave(paste0("FP_",samplename,"_",genenames,".png"), dpi=300, width=wid, height=hei)
+  ggsave(paste0(Name, "FP_", genenames,".png"), dpi=150, width=wid, height=hei)
 }
 
 # Example 1
@@ -152,6 +165,36 @@ fun.fp.batch <- function(object, genelist, samplename, row.num){
 #  fun.fp.batch(a_object, ECmarkers, filname, 2)
 # }
 # example 終了 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
+
+#> featureplotをそれぞれ１つずつ保存する　>>>>>>>>>>>>>>>>>>
+fun.fp.batch.each.output <- 
+  function(object, genelist,
+           Name = NULL,
+           red = "umap.cca",
+           colors = NULL,
+           hei = 5, wid = 5){
+
+  if(is.null(colors)){
+      require(wesanderson)
+        colors = viridis::viridis(10)
+        # colors = wes_palette("Zissou1", type = "continuous")
+    }
+  
+  ps <- list()
+  for (gene in genelist){
+    
+    p <- 
+      FeaturePlot(object, gene, reduction = red) +
+      scale_color_gradientn(colours = colors) + 
+      theme(aspect.ratio = 1)
+    
+    plot(p)
+      ggsave(paste0(Name, "FP_", gene,".png"), 
+             dpi = 150, width = wid, height = hei)
+  }
+} # end function
+## <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
 
 
 ## scoreingした後のグラフをかく．subtitleにどのgene

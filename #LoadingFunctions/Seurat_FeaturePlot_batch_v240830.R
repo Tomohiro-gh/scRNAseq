@@ -25,7 +25,7 @@ FUN.FeatureP.batch.MarkerGene <- function(seurat_obj, genelist, Redec, samplenam
       scale_color_gradientn(colours = my_pal) +
       my_theme
     
-    ps[[gene]] <- p
+    ps[[gene]] <- pd
   }
   
   # genenames <- paste(genelist, collapse = ",")
