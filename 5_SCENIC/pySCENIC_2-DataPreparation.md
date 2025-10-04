@@ -123,12 +123,12 @@ if adata.X.dtype != np.float32:
     adata.X = adata.X.astype(np.float32)
 ```
 
-##### --- ここからrow_attrsとcol_attrsの定義 ---
+### --- ここからrow_attrsとcol_attrsの定義 ---
 - AnnDataのobs (細胞メタデータ) と var (遺伝子メタデータ) をDataFrameに変換
 - Loomファイルには `obs` が `col_attrs`、`var` が `row_attrs` に対応します
 - 必ずDataFrame形式である必要があります
 
-
+#### col attrにmeta dataを格納
 ```python
 # adata.obs (細胞属性) -> col_attrs (Loomファイルの列属性)
 col_attrs = {}
@@ -145,8 +145,32 @@ col_attrs['CellID'] = np.array(adata.obs_names.values, dtype=str)
 
 ```
 
+#### col attrにumapのembedding情報も付け加えておく
+- seuratではumapに好きな名前をつけられるが，scanpyはUMAP_X, UMAP_Yが呼び出されるため，座標の名前も含めて変えておく
+
 ```python
-# adata.var (遺伝子属性) -> row_attrs (Loomファイルの行属性)
+# AnnDataオブジェクトからUMAPの埋め込み情報を取得し、col_attrsに追加
+# UMAPの座標が`X_umap_harmony`というキーで保存されていると仮定
+if 'X_umap.harmony' in adata.obsm:
+    umap_coords = adata.obsm['X_umap.harmony']
+    
+    # 座標の列数をチェックし、適切なキー名で追加
+    if umap_coords.shape[1] >= 2:
+        # X座標
+        col_attrs['UMAP_X'] = umap_coords[:, 0]
+        # Y座標
+        col_attrs['UMAP_Y'] = umap_coords[:, 1]
+    else:
+        print("UMAP embedding does not have at least 2 dimensions. Skipping addition.")
+else:
+    print("UMAP embedding 'X_umap_harmony' not found in data.obsm.")
+
+```
+
+
+#### row attrに遺伝子名を格納
+- adata.var (遺伝子属性) -> row_attrs (Loomファイルの行属性)
+```python
 row_attrs = {}
 for col in adata.var.columns:
     # CategoricalDtypeの場合、文字列に変換してNumPy配列にする
