@@ -1,6 +1,46 @@
 #　pySCENIC CLI
 
 ## STEP0 - パラメータSettings
+#### 変数の設定
+```sh
+# --- 設定変数 ---
+# ご自身の環境に合わせてパスを修正してください
+# working directory
+wd="$HOME/path/t0/SCENIC"
+cd $wd
+
+# --- 1. グローバル環境変数とパスの定義 ---
+# スクリプト全体で使われる変数はこちらで定義します。
+
+# Dask メモリ関連の環境変数設定 (調整可能)
+# export DASK_DISTRIBUTED__WORKER__MEMORY__TARGET="0.75"
+# export DASK_DISTRIBUTED__WORKER__MEMORY__SPILL="0.85"
+# export DASK_DISTRIBUTED__WORKER__MEMORY__PAUSE="0.90"
+# export DASK_DISTRIBUTED__WORKER__MEMORY__TERMINATE="0.95"
+# export DASK_TEMPORARY_DIRECTORY=$wd # 高速なSSD上のテンポラリディレクトリを推奨
+
+# Pythonの警告を抑制する設定
+export PYTHONWARNINGS="ignore"
+
+# loomファイルのパス: raw countのみ格納している
+INPUT_EXP_MTX="$wd/EC5T_195544cells_v290929.loom"
+
+# Database ----
+# 転写因子（TF）リストファイルのパス
+TF_LIST="$HOME/SCENIC_resource/Ref_Datasets/TFlist/allTFs_mm.txt"
+# モチーフデータベースファイルのパス (例: ヒトhg38の場合)
+MOTIF_DB1="$HOME/SCENIC_resource/Ref_Datasets/cisTarget_mm10-refseq_r80_mc10_v10_clust/mm10_10kbp_up_10kbp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather"
+MOTIF_DB2="$HOME/SCENIC_resource/Ref_Datasets/cisTarget_mm10-refseq_r80_mc10_v10_clust/mm10_500bp_up_100bp_down_full_tx_v10_clust.genes_vs_motifs.rankings.feather"
+# Annotation data
+ANNOTATIONS_FNAME="$HOME/SCENIC_resource/Ref_Datasets/motifs/motifs-v10nr_clust-nr.mgi-m0.001-o0.0.tbl"
+# Database ----
+
+# 使用するCPUコア数 (お使いの環境に合わせて調整)
+NUM_WORKERS=12
+
+```
+
+#### 変数の出力
 ```sh
  # 作業ディレクトリへ移動
   cd "$wd" || { echo "ERROR: Working directory '$wd' not found. Exiting." >&2; exit 1; }
@@ -102,6 +142,10 @@
   fi
 ```
 
+
+
+
+## STEP3 - AUCellの実行
 ```sh
 # --- STEP 3: AUCell (Activity calculation) ---
   echo -e "\n--- STEP 3/3: AUCellを開始します (pyscenic aucell) ---"
@@ -139,7 +183,3 @@
 echo "最終ログ: 全ての出力は '${LOG_FILE}' に保存されました。"
 
 ```
-
-
-
-## STEP3 - AUCellの実行
