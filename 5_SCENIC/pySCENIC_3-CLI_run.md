@@ -1,4 +1,5 @@
-#　pySCENIC CLI
+# pySCENIC CLI 
+- python環境に入り，コマンドラインで実施
 
 ## STEP0 - パラメータSettings
 #### 変数の設定
