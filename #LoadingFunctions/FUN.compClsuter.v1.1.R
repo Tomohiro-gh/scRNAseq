@@ -8,6 +8,8 @@ library(org.Dr.eg.db)
 
 Fun.Comp.Clsuter.GOKGRA.v1.1 <-
   function(NamedGenelists, filename, Wid = 18, Hei = 6, nCat = 10){ # nCat のデフォルト値を設定
+    require(org.Mm.eg.db)
+    require(clusterProfiler)
     FileNameBody = paste0(filename)
     
     ## Theme -----------------------------------
